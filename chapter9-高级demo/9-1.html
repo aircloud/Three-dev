@@ -190,6 +190,7 @@
 							 r + "posz.jpg", r + "negz.jpg" ];
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				// 这样去做可以做一个天空盒图片 参考链接:http://blog.csdn.net/birdflyto206/article/details/52414405
 				textureCube.format = THREE.RGBFormat;
 				var shader = THREE.ShaderLib[ "cube" ];
 				shader.uniforms[ "tCube" ].value = textureCube;
