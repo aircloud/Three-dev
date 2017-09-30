@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>透视投影</title>
+		<script src="js/Three.js"></script>
+		<script src="js/dat.gui.js"></script>
+		<style type="text/css">
+			div#canvas-frame {
+				border: none;
+				cursor: pointer;
+				width: 100%;
+				height: 600px;
+				background-color: #EEEEEE;
+			}
+
+		</style>
+		<script>
+            var renderer;
+            function initThree() {
+                width = document.getElementById('canvas-frame').clientWidth;
+                height = document.getElementById('canvas-frame').clientHeight;
+                renderer = new THREE.WebGLRenderer({
+                    antialias : true
+                });
+                renderer.setSize(width, height);
+                document.getElementById('canvas-frame').appendChild(renderer.domElement);
+                renderer.setClearColor(0xFFFFFF, 1.0);
+            }
+
+            var camera;
+            function initCamera() {
+                camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+				/*
+				 PerspectiveCamera( fov, aspect, near, far ) 透视投影
+				 1、视角fov：这个最难理解,我的理解是,眼睛睁开的角度,即,视角的大小,如果设置为0,相当你闭上眼睛了,所以什么也看不到,如果为180,那么可以认为你的视界很广阔,但是在180度的时候，往往物体很小，因为他在你的整个可视区域中的比例变小了。
+				 2、近平面near：这个呢，表示你近处的裁面的距离。补充一下，也可以认为是眼睛距离近处的距离，假设为10米远，请不要设置为负值，Three.js就傻了,不知道怎么算了,
+				 3、远平面far：这个呢，表示你远处的裁面,
+				 4、纵横比aspect：实际窗口的纵横比，即宽度除以高度。这个值越大，说明你宽度越大，那么你可能看的是宽银幕电影了，如果这个值小于1，那么可能你看到的是如下的图中的LED屏幕了。
+				 一般都会这么用 var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+				 非常明白，无须解释
+				*
+				* */
+                camera.position.x = 0;
+                camera.position.y = 0;
+                camera.position.z = 600;
+                camera.up.x = 0;
+                camera.up.y = 1;
+                camera.up.z = 0;
+                camera.lookAt({
+                    x : 0,
+                    y : 0,
+                    z : 0
+                });
+            }
+
+            var scene;
+            function initScene() {
+                scene = new THREE.Scene();
+            }
+
+            var light;
+            function initLight() {
+				light = new THREE.AmbientLight(0xFF0000);
+                light.position.set(100, 100, 200);
+                scene.add(light);
+				
+                light = new THREE.PointLight(0x00FF00);
+                light.position.set(0, 0,300);
+                scene.add(light);
+            }
+
+            var cube;
+            function initObject() {
+                var geometry = new THREE.CylinderGeometry( 70,100,200);
+                var material = new THREE.MeshLambertMaterial( { color:0xFFFFFF} );
+                var mesh = new THREE.Mesh( geometry,material);
+                mesh.position = new THREE.Vector3(0,0,0);
+                scene.add(mesh);
+            }
+
+            function threeStart() {
+                initThree();
+                initCamera();
+                initScene();
+                initLight();
+                initObject();
+				createUI();
+                animation();
+
+            }
+
+			var text;
+			function createUI()
+			{
+				var FizzyText = function() {
+					this.fov = 45;
+				};
+			
+				text = new FizzyText();
+				var gui = new dat.GUI();
+				gui.add(text,"fov",0,180).name("视角大小");
+			}
+			
+            function animation()
+            {
+				changeFov();
+                renderer.render(scene, camera);
+                requestAnimationFrame(animation);
+            }
+			
+			function setCameraFov(fov)
+			{
+				camera.fov = fov;
+				camera.updateProjectionMatrix();
+			}
+			
+			function changeFov()
+			{
+				setCameraFov(text.fov);
+			}
+		</script>
+	</head>
+
+	<body onload="threeStart();">
+		<div id="canvas-frame"></div>
+	</body>
+</html>
